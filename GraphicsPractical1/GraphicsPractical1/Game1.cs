@@ -32,6 +32,9 @@ namespace GraphicsPractical1
         // Chapter 3: adding our new camera class
         private Camera camera;
 
+        // Chapter 6: the Terrain
+        private Terrain terrain;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -112,10 +115,11 @@ namespace GraphicsPractical1
             this.effect.VertexColorEnabled = true;
 
             // Creating our camera
-            this.camera = new Camera(new Vector3(0, 0, 50), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            this.camera = new Camera(new Vector3(0, 10, 0), new Vector3(0, 0, 0), new Vector3(0, 0, -1));
 
-            // Chapter 6, turning our loaded image into an array
+            // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             loadHeightData();
+            this.terrain = new Terrain(this.heightData);
 
         }
 
@@ -225,6 +229,10 @@ namespace GraphicsPractical1
             {
                 pass.Apply();
             }
+
+
+            // Chapter 6: replaced DrawUserPrimitives() with this
+            this.terrain.Draw(this.GraphicsDevice);
 
             base.Draw(gameTime);
         }
