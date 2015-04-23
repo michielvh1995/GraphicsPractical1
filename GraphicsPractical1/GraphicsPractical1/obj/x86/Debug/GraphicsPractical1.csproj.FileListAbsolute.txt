@@ -1,0 +1,6 @@
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\GraphicsPractical1.exe
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\GraphicsPractical1.pdb
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\GraphicsPractical1.csprojResolveAssemblyReference.cache
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\GraphicsPractical1.exe
+c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\GraphicsPractical1.pdb
