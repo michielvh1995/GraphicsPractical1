@@ -17,6 +17,9 @@ namespace GraphicsPractical1
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        // used to store the heights of the "landscape", as derived from the bitmap 
+        private float[,] heightData;
+
         // UU provided FPS Counter, with  some additions made by us
         private FrameRateCounter frameRateCounter;
 
@@ -25,9 +28,6 @@ namespace GraphicsPractical1
 
         // Adding effects so we can use shaders
         private BasicEffect effect;
-
-        // Chapter 2: Vertices 
-        private VertexPositionColor[] vertices;
 
         // Chapter 3: adding our new camera class
         private Camera camera;
@@ -47,24 +47,25 @@ namespace GraphicsPractical1
             Content.RootDirectory = "Content";
         }
 
-        /*
-         Chapter 2: 
-         * Creating a bunch of random Vertices to demonstrate the drawing power of XNA
-         Chapter 3:
-         * Changing the coordinates from a 2D plane to a 3D World Space.
-         * Result:    Triangle's gone. 
-         * Why?       We've stopped using the predifined screen-coordinates ([-1 to 1; -1 to 1]).
-         * Solution:  Creating a camera to transform these 3D coords to the 2D screen-coords.
-        */
-        private void setupVertices()
+        // Temp-o-rary
+        private void loadHeightData()
         {
-            this.vertices = new VertexPositionColor[3];
-            this.vertices[0].Position = new Vector3(-10f, 0f, 0f);
-            this.vertices[0].Color = Color.Red;
-            this.vertices[1].Position = new Vector3(0f, 10f, 0f);
-            this.vertices[1].Color = Color.Yellow;
-            this.vertices[2].Position = new Vector3(10f, 0f, 0f);
-            this.vertices[2].Color = Color.Green;
+            this.heightData = new float[4, 3];
+
+            this.heightData[0, 0] = 0;
+            this.heightData[1, 0] = 0;
+            this.heightData[2, 0] = 0;
+            this.heightData[3, 0] = 0;
+
+            this.heightData[0, 1] = 0.5f;
+            this.heightData[1, 1] = 0;
+            this.heightData[2, 1] = -1.0f;
+            this.heightData[3, 1] = 0.2f;
+
+            this.heightData[0, 2] = 1.0f;
+            this.heightData[1, 2] = 1.2f;
+            this.heightData[2, 2] = 0.8f;
+            this.heightData[3, 2] = 0;
         }
 
         /// <summary>
@@ -110,11 +111,11 @@ namespace GraphicsPractical1
             // ... and using that effect to enable colors
             this.effect.VertexColorEnabled = true;
 
-            // Temporary
-            this.setupVertices();
-
             // Creating our camera
             this.camera = new Camera(new Vector3(0, 0, 50), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+
+            // Chapter 6, turning our loaded image into an array
+            loadHeightData();
 
         }
 
@@ -139,7 +140,7 @@ namespace GraphicsPractical1
 
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
-            
+
             #region Rotating the object in the world
             /*
              Spin the triangle!
@@ -159,7 +160,7 @@ namespace GraphicsPractical1
             {
                 this.camera.Eye = Vector3.Transform(
                        this.camera.Eye,
-                       Matrix.CreateFromAxisAngle(this.camera.Up,deltaAngle)
+                       Matrix.CreateFromAxisAngle(this.camera.Up, deltaAngle)
                        );
                 Console.WriteLine("(E: " + this.camera.Eye + "; F: " + this.camera.Focus + "; U: " + this.camera.Up + ")");
             }
@@ -204,10 +205,12 @@ namespace GraphicsPractical1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // Enabling/disabling culling (not drawing certain triangles).
+            // Enabling/disabling culling (not drawing certain triangles)
+            // Chapter 6: FillMode is the way the triangles are set up: here it is set to just drawing the wireframe. The other option is to fill in each triangle and have a bunch of survaces
             this.GraphicsDevice.RasterizerState = new RasterizerState
             {
-                CullMode = CullMode.None
+                CullMode = CullMode.None,
+                FillMode = FillMode.WireFrame
             };
 
             // Background color of the image
@@ -222,11 +225,6 @@ namespace GraphicsPractical1
             {
                 pass.Apply();
             }
-
-            this.GraphicsDevice.DrawUserPrimitives(
-                PrimitiveType.TriangleList,
-                this.vertices, 0, 1,
-                VertexPositionColor.VertexDeclaration);
 
             base.Draw(gameTime);
         }
