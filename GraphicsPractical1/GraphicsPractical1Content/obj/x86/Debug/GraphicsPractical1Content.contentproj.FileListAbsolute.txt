@@ -1,1 +1,2 @@
 c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1Content\obj\x86\Debug\GraphicsPractical1Content.contentprojResolveAssemblyReference.cache
+C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1Content\obj\x86\Debug\GraphicsPractical1Content.contentprojResolveAssemblyReference.cache

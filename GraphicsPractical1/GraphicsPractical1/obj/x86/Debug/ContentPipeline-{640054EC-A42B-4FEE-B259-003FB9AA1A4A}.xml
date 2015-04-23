@@ -8,10 +8,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1Content\</RootDirectory>
-      <LoggerRootDirectory>c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\</LoggerRootDirectory>
-      <IntermediateDirectory>c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1Content\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>

@@ -26,11 +26,28 @@ namespace GraphicsPractical1
         private Vector3 up;
         private Vector3 eye;
         private Vector3 focus;
+        private Vector3 forward;
+
+        public Vector3 Forward
+        {
+            get { return this.forward; }
+            set
+            {
+                this.forward = value;
+                Vector3 newEye = focus - Forward;
+                if (eye != newEye)
+                    eye = newEye;
+            }
+        }
+
         // These matrices have no set-function, because the projection matrix, once set, probably never has to be changed and the view matrix only depends on the eye and focus vector, so it makes more sense to  adjust  the  view  matrix  by  changing  those  properties.
         // However, the viewMatri has to be recalculated each time the eye- or focus vector changes.
         public Matrix ViewMatrix
         {
             get { return this.viewMatrix; }
+
+            // Testing: adding 3 dimensinal rotation
+            set { viewMatrix = value; }
         }
 
         public Matrix ProjectionMatrix
@@ -59,6 +76,31 @@ namespace GraphicsPractical1
             }
         }
 
+        // Used for rotating the thing up and down
+        public Vector3 Up
+        {
+            get { return this.up; }
+            set
+            {
+                this.up = value;
+                updateViewMatrix();
+            }
+        }
+
+        public void Pitch(float amount)
+        {
+            Forward.Normalize();
+
+            var left = Vector3.Cross(Up, Forward);
+            left.Normalize();
+
+            Console.WriteLine("F: " + Forward + " L: " + left);
+
+            Forward = Vector3.Transform(Forward, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
+            Up = Vector3.Transform(Up, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
+            Console.WriteLine("F: " + Forward + " U: " + Up);
+        }
+
         public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float aspectRatio = 4.0f / 3.0f)
         {
             this.up = camUp;
@@ -81,11 +123,12 @@ namespace GraphicsPractical1
         {
             /* 
               Argument 1: the position of the camera
-              Argument 2: the direction it's looking at
+              Argument 2: the direction it's looking in
               Argument 3: what direction is considered to be up
             */
             this.viewMatrix = Matrix.CreateLookAt(this.eye, this.focus, this.up);
-        }
+            this.Forward = this.focus - this.eye;
 
+        }
     }
 }

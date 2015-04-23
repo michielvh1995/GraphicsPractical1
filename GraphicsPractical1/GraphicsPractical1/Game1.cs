@@ -17,7 +17,7 @@ namespace GraphicsPractical1
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        // UU provided FPS Counter
+        // UU provided FPS Counter, with  some additions made by us
         private FrameRateCounter frameRateCounter;
 
         // Multithreading
@@ -32,9 +32,6 @@ namespace GraphicsPractical1
         // Chapter 3: adding our new camera class
         private Camera camera;
 
-        // Chapter 4: enabling rotation
-        private float angle;
-
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -45,9 +42,6 @@ namespace GraphicsPractical1
 
             // Telling the program the FPS Counter has to be used. Will be called after the Update() and Draw() methods
             this.Components.Add(this.frameRateCounter);
-
-            // Setting up the concurrent 
-
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -65,14 +59,13 @@ namespace GraphicsPractical1
         private void setupVertices()
         {
             this.vertices = new VertexPositionColor[3];
-            this.vertices[0].Position = new Vector3(0f, 0f, 0f);
+            this.vertices[0].Position = new Vector3(-10f, 0f, 0f);
             this.vertices[0].Color = Color.Red;
-            this.vertices[1].Position = new Vector3(10f, 10f, 0f);
+            this.vertices[1].Position = new Vector3(0f, 10f, 0f);
             this.vertices[1].Color = Color.Yellow;
-            this.vertices[2].Position = new Vector3(10f, 0f, -5f);
+            this.vertices[2].Position = new Vector3(10f, 0f, 0f);
             this.vertices[2].Color = Color.Green;
         }
-
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -141,18 +134,61 @@ namespace GraphicsPractical1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // Amount of seconds between this and the previous Update()
             float timeStep = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
+            
+            #region Rotating the object in the world
+            /*
+             Spin the triangle!
+             Not using a fixed amount per Update() (angle += 3.0f), but an fixed amount per time (angle += 3*timeStep)!
+             Doing the former would make the "Physics" of this game/simulation be bound to the frame rate: doubling the FPS would double the rotation speed.
+             Using the latter, the triangle will rotate every x seconds y degrees, no matter what the FPS is.
+            */
+            float deltaAngle = 0;
+            KeyboardState kbState = Keyboard.GetState();
+            if (kbState.IsKeyDown(Keys.Left))
+            {
+                deltaAngle += -3 * timeStep;
+            }
+            if (kbState.IsKeyDown(Keys.Right))
+                deltaAngle += 3 * timeStep;
+            if (deltaAngle != 0)
+            {
+                this.camera.Eye = Vector3.Transform(
+                       this.camera.Eye,
+                       Matrix.CreateFromAxisAngle(this.camera.Up,deltaAngle)
+                       );
+                Console.WriteLine("(E: " + this.camera.Eye + "; F: " + this.camera.Focus + "; U: " + this.camera.Up + ")");
+            }
 
-            // Spin the triangle!
-            this.angle += 0.05f;
+            float yAngle = 0;
+            if (kbState.IsKeyDown(Keys.Up))
+            {
+                yAngle += -30.0f * timeStep;
+            }
+            if (kbState.IsKeyDown(Keys.Down))
+                yAngle += 30.0f * timeStep;
+            if (yAngle != 0)
+            {
+                this.camera.Pitch(yAngle);
 
+                this.camera.Forward.Normalize();
+                var left = Vector3.Cross(this.camera.Up, this.camera.Forward);
+                left.Normalize();
+
+                this.camera.Forward = Vector3.Transform(this.camera.Forward, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(yAngle)));
+                this.camera.Up = Vector3.Transform(this.camera.Up, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(yAngle)));
+            }
+            #endregion
 
             #region Keyboard stuff
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 this.Exit();
