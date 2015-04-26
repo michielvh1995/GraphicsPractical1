@@ -115,12 +115,12 @@ namespace GraphicsPractical1
             this.effect.VertexColorEnabled = true;
 
             // Creating our camera
-            this.camera = new Camera(new Vector3(0, 10, 0), new Vector3(0, 0, 0), new Vector3(0, 0, -1));
+            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             loadHeightData();
-            this.terrain = new Terrain(this.heightData);
-
+            Texture2D map = Content.Load<Texture2D>("heightmap");
+            this.terrain = new Terrain(new HeightMap(map), 0.2f);
         }
 
         /// <summary>
@@ -218,11 +218,14 @@ namespace GraphicsPractical1
             };
 
             // Background color of the image
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
+
+            Matrix translation = Matrix.CreateTranslation(-0.5f * this.terrain.Width, 0, 0.5f * this.terrain.Width);
 
             // Changing the world accordingly to what the camera sees
             this.effect.Projection = this.camera.ProjectionMatrix;
             this.effect.View = this.camera.ViewMatrix;
+            this.effect.World = translation;
             this.effect.World = Matrix.Identity;
 
             foreach (EffectPass pass in this.effect.CurrentTechnique.Passes)

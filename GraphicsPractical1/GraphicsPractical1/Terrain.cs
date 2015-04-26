@@ -35,23 +35,26 @@ namespace GraphicsPractical1
         }
 
         // The constructor method
-        public Terrain(float[,] heightData)
+        public Terrain(HeightMap heightMap, float heightScale)
         {
-            this.width = heightData.GetLength(0);
-            this.height = heightData.GetLength(1);
-            VertexPositionColor[] heightDataVertices = this.loadVertices(heightData);
+            this.width = heightMap.Width;
+            this.height = heightMap.Height;
+
+            VertexPositionColor[] heightDataVertices = this.loadVertices(heightMap, heightScale);
             this.setupVertices(heightDataVertices);
         }
         // Chapter 6:
         //
-        private VertexPositionColor[] loadVertices(float[,] heightData)
+        private VertexPositionColor[] loadVertices(HeightMap heightMap, float heightScale)
         {
             VertexPositionColor[] vertices = new VertexPositionColor[this.width * this.height];
-            for (int x = 0; x < this.width; x++)
-                for (int y = 0; y < this.height; y++)
+
+            for (int x = 0; x < this.width; ++x)
+                for (int y = 0; y < this.height; ++y)
                 {
                     int v = x + y * this.width;
-                    vertices[v].Position = new Vector3(x, heightData[x, y], -y);
+                    float h = heightMap[x, y] * heightScale;
+                    vertices[v].Position = new Vector3(x, h, -y);
                     vertices[v].Color = Color.White;
                 }
             return vertices;
