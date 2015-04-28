@@ -23,8 +23,11 @@ namespace GraphicsPractical1
         // UU provided FPS Counter, with  some additions made by us
         private FrameRateCounter frameRateCounter;
 
-        // Multithreading
+        // Bonus:
+        // Multithreading:
         private Thread t;
+        // FoV slider
+        private float _FoV = MathHelper.PiOver4;
 
         // Adding effects so we can use shaders
         private BasicEffect effect;
@@ -115,12 +118,18 @@ namespace GraphicsPractical1
             this.effect.VertexColorEnabled = true;
 
             // Creating our camera
-            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0),_FoV);
 
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             loadHeightData();
             Texture2D map = Content.Load<Texture2D>("heightmap");
             this.terrain = new Terrain(new HeightMap(map), 0.2f);
+        }
+
+        // Bonus: camera with differing FoV
+        private void updateCameraFOV()
+        {
+            this.camera.FieldOfView = this._FoV;
         }
 
         /// <summary>
@@ -198,6 +207,13 @@ namespace GraphicsPractical1
             {
                 this.Exit();
             }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.E))
+            {
+                this._FoV += 0.1f * timeStep;
+                this.updateCameraFOV();
+            }
+
             #endregion
 
             base.Update(gameTime);
@@ -211,6 +227,7 @@ namespace GraphicsPractical1
         {
             // Enabling/disabling culling (not drawing certain triangles)
             // Chapter 6: FillMode is the way the triangles are set up: here it is set to just drawing the wireframe. The other option is to fill in each triangle and have a bunch of survaces
+            // Chapter 7: FillMode will be set to Solid. This will color the entire surface of the traingles.
             this.GraphicsDevice.RasterizerState = new RasterizerState
             {
                 CullMode = CullMode.None,

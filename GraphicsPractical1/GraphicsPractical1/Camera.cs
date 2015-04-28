@@ -28,6 +28,21 @@ namespace GraphicsPractical1
         private Vector3 focus;
         private Vector3 forward;
 
+        // Bonus: changable FoV
+        private float fieldOfView;
+        private float aspectRatio;
+
+
+        public float FieldOfView
+        {
+            get { return fieldOfView; }
+            set
+            {
+                fieldOfView = value;
+                this.updateFoV();
+            }
+        }
+
         public Vector3 Forward
         {
             get { return this.forward; }
@@ -101,21 +116,32 @@ namespace GraphicsPractical1
             Console.WriteLine("F: " + Forward + " U: " + Up);
         }
 
-        public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float aspectRatio = 4.0f / 3.0f)
+        public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float fov, float _aspectRatio = 4.0f / 3.0f)
         {
             this.up = camUp;
             this.eye = camEye;
             this.focus = camFocus;
 
-            this.updateViewMatrix();
+            // Bonus (Changable FoV):
+            this.fieldOfView = fov;
+            this.aspectRatio = _aspectRatio;
+            this.updateFoV();
 
-            // Filling in the projectionMatrix (needs to be done once)
+            this.updateViewMatrix();
+        }
+
+        private void updateFoV()
+        {
+            // Filling in the projectionMatrix, with the added Bonus nolonger needs to be only filled once, but everytime the FoV changes.
             // This determines how the camera will look at the scene.
             // The first argument is responsible for the FoV options (the view angle of the camera).
-            // The second sets the aspect ratio
+            //      (Field of view in the y direction, in radians) 
+            // Argument 2: sets the aspect ratio
             // Argument 3: minimum viewing distance, objects that are too close wont be rendered
             // Argument 4: maximum viewing distance, objects that are too far away wont be rendered
-            this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1.0f, 300.0f);
+
+            // Te groter argument 1 is, te groter de FoV
+            this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(this.fieldOfView, this.aspectRatio, 1.0f, 300.0f);
         }
 
         // This method creates the view matrix, a matrix that stores the position and orientation of the camera, through which we look at the scene.
