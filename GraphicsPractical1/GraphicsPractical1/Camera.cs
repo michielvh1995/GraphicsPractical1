@@ -32,17 +32,6 @@ namespace GraphicsPractical1
         private float fieldOfView;
         private float aspectRatio;
 
-
-        public float FieldOfView
-        {
-            get { return fieldOfView; }
-            set
-            {
-                fieldOfView = value;
-                this.updateFoV();
-            }
-        }
-
         public Vector3 Forward
         {
             get { return this.forward; }
@@ -124,12 +113,12 @@ namespace GraphicsPractical1
             // Bonus (Changable FoV):
             this.fieldOfView = fov;
             this.aspectRatio = _aspectRatio;
-            this.updateFoV();
+            this.updateFoV(0f);
 
             this.updateViewMatrix();
         }
 
-        private void updateFoV()
+        public void updateFoV(float value)
         {
             // Filling in the projectionMatrix, with the added Bonus nolonger needs to be only filled once, but everytime the FoV changes.
             // This determines how the camera will look at the scene.
@@ -140,6 +129,7 @@ namespace GraphicsPractical1
             // Argument 4: maximum viewing distance, objects that are too far away wont be rendered
 
             // Te groter argument 1 is, te groter de FoV
+            this.aspectRatio += value;
             this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(this.fieldOfView, this.aspectRatio, 1.0f, 300.0f);
         }
 

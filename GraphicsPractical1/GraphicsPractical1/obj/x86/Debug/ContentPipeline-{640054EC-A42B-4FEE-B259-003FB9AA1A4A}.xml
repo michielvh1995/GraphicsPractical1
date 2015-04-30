@@ -19,6 +19,15 @@
       <Output>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\heightmap2.xnb</Output>
       <Time>2015-04-30T09:27:23.235611+02:00</Time>
     </Item>
+    <Item>
+      <Source>terrain.png</Source>
+      <Name>terrain</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\terrain.xnb</Output>
+      <Time>2015-04-30T10:43:09.0896016+02:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <ContentProjectGUID>{640054EC-A42B-4FEE-B259-003FB9AA1A4A}</ContentProjectGUID>

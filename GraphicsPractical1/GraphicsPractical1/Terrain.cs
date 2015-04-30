@@ -23,7 +23,13 @@ namespace GraphicsPractical1
         private int width;
         private int height;
 
+        // Chapter 7
         private VertexPositionColorNormal[] vertices;
+
+        // Chapter 8
+        private short[] indices;
+        private VertexBuffer vertexBuffer;
+        private IndexBuffer indexBuffer;
 
         public int Width
         {
@@ -35,16 +41,23 @@ namespace GraphicsPractical1
         }
 
         // The constructor method
-        public Terrain(HeightMap heightMap, float heightScale)
+        public Terrain(HeightMap heightMap, float heightScale, GraphicsDevice device)
         {
             this.width = heightMap.Width;
             this.height = heightMap.Height;
 
             VertexPositionColorNormal[] heightDataVertices = this.loadVertices(heightMap, heightScale);
-            this.setupVertices(heightDataVertices);
+
+            // Chapter 8:
+            // Changed the use of vertices[] as well
+            this.vertices = this.loadVertices(heightMap, heightScale);
+            this.setupIndices();
 
             // Chapter 7:
             this.calculateNormals();
+
+            // Chapter 8:
+            this.copyToBuffers(device);
         }
         // Chapter 6:
         //
@@ -72,12 +85,17 @@ namespace GraphicsPractical1
          * Step 2 of Chapter 6: Replaced the *3 wih *6, since we will be drawing twice as many triangles now, by implementing 3D
          * 
         */
-        private void setupVertices(VertexPositionColorNormal[] heightDataVertices)
+        /*
+            Chapter 8:
+              Changed SetupVertices(..) to SetupIndices()
+        */
+        private void setupIndices()
         {
-            this.vertices = new VertexPositionColorNormal[(this.width - 1) * (this.height - 1) * 6];
+            this.indices = new short[(this.width - 1) * (this.height - 1) * 6];
+
             int counter = 0;
-            for
-            (int x = 0; x < this.width - 1; x++)
+
+            for (int x = 0; x < this.width - 1; x++)
                 for (int y = 0; y < this.height - 1; y++)
                 {
                     int lowerLeft = x + y * this.width;
@@ -85,44 +103,63 @@ namespace GraphicsPractical1
                     int topLeft = x + (y + 1) * this.width;
                     int topRight = (x + 1) + (y + 1) * this.width;
 
-                    this.vertices[counter++] = heightDataVertices[topLeft];
-                    this.vertices[counter++] = heightDataVertices[lowerRight];
-                    this.vertices[counter++] = heightDataVertices[lowerLeft];
-
-                    this.vertices[counter++] = heightDataVertices[topLeft];
-                    this.vertices[counter++] = heightDataVertices[topRight];
-                    this.vertices[counter++] = heightDataVertices[lowerRight];
+                    this.indices[counter++] = (short)topLeft;
+                    this.indices[counter++] = (short)lowerRight;
+                    this.indices[counter++] = (short)lowerLeft;
+                    this.indices[counter++] = (short)topLeft;
+                    this.indices[counter++] = (short)topRight;
+                    this.indices[counter++] = (short)lowerRight;
                 }
         }
 
         // Chapter 7:
         // Calculates the normals of each of the vertices
+        // Chapter 8:
+        // Improved calculation method
         private void calculateNormals()
         {
-            for (int i = 0; i < this.vertices.Length / 3; i++)
+            for (int i = 0; i < this.indices.Length / 3; i++)
             {
-                VertexPositionColorNormal v1 = this.vertices[i * 3];
-                VertexPositionColorNormal v2 = this.vertices[i * 3 + 1];
-                VertexPositionColorNormal v3 = this.vertices[i * 3 + 2];
+                short i1 = this.indices[i * 3];
+                short i2 = this.indices[i * 3 + 1];
+                short i3 = this.indices[i * 3 + 2];
 
-                Vector3 side1 = v3.Position - v1.Position;
-                Vector3 side2 = v2.Position - v1.Position;
+                Vector3 side1 = this.vertices[i3].Position - this.vertices[i1].Position;
+                Vector3 side2 = this.vertices[i2].Position - this.vertices[i1].Position;
                 Vector3 normal = Vector3.Cross(side1, side2);
 
                 normal.Normalize();
-                this.vertices[i * 3].Normal = normal;
-                this.vertices[i * 3 + 1].Normal = normal;
-                this.vertices[i * 3 + 2].Normal = normal;
+
+                this.vertices[i1].Normal += normal;
+                this.vertices[i2].Normal += normal;
+                this.vertices[i3].Normal += normal;
             }
+
+            for (int i = 0; i < this.vertices.Length; i++)
+                this.vertices[i].Normal.Normalize();
         }
 
+        // Chapter 8:
+        //
+        private void copyToBuffers(GraphicsDevice device)
+        {
+            this.vertexBuffer = new VertexBuffer(
+                device, VertexPositionColorNormal.VertexDeclaration,
+                this.vertices.Length, BufferUsage.WriteOnly);
+            this.vertexBuffer.SetData(this.vertices);
+
+            this.indexBuffer = new IndexBuffer(device, typeof(short), this.indices.Length, BufferUsage.WriteOnly);
+            this.indexBuffer.SetData(this.indices);
+
+            device.Indices = this.indexBuffer;
+            device.SetVertexBuffer(this.vertexBuffer);
+        }
         // Chapter 6: the Terrain's Draw(..) function, used to draw this thing on the screen when called by the main functions
         public void Draw(GraphicsDevice device)
         {
-            device.DrawUserPrimitives(
-                PrimitiveType.TriangleList, this.vertices, 0,
-                this.vertices.Length / 3, VertexPositionColorNormal.VertexDeclaration
-                );
+            device.DrawIndexedPrimitives(
+                PrimitiveType.TriangleList, 0, 0,
+                this.vertices.Length, 0, this.indices.Length / 3);
         }
     }
 }

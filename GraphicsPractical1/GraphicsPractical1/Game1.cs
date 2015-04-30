@@ -26,8 +26,6 @@ namespace GraphicsPractical1
         // Bonus:
         // Multithreading:
         private Thread t;
-        // FoV slider
-        private float _FoV = MathHelper.PiOver4;
 
         // Adding effects so we can use shaders
         private BasicEffect effect;
@@ -130,8 +128,8 @@ namespace GraphicsPractical1
 
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             loadHeightData();
-            Texture2D map = Content.Load<Texture2D>("heightmap2");
-            this.terrain = new Terrain(new HeightMap(map), 0.2f);
+            Texture2D map = Content.Load<Texture2D>("heightmap");
+            this.terrain = new Terrain(new HeightMap(map), 0.2f, GraphicsDevice);
         }
 
         /// <summary>
@@ -156,7 +154,6 @@ namespace GraphicsPractical1
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
 
-
             #region Keyboard stuff
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
@@ -166,8 +163,8 @@ namespace GraphicsPractical1
             // Bonus: camera with differing FoV
             if (Keyboard.GetState().IsKeyDown(Keys.E))
             {
-                this._FoV += 0.1f * timeStep;
-                this.camera.FieldOfView = this._FoV;
+                //this._FoV += 0.1f * timeStep;
+                this.camera.updateFoV(0.1f * timeStep);
             }
 
             #region Rotating the object in the world
