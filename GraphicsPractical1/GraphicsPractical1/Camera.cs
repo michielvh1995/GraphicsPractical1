@@ -91,6 +91,7 @@ namespace GraphicsPractical1
             }
         }
 
+        #region Rotation around the X-axis
         // Used for rotating the thing up and down
         public Vector3 Up
         {
@@ -109,12 +110,10 @@ namespace GraphicsPractical1
             var left = Vector3.Cross(Up, Forward);
             left.Normalize();
 
-            Console.WriteLine("F: " + Forward + " L: " + left);
-
             Forward = Vector3.Transform(Forward, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
             Up = Vector3.Transform(Up, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
-            Console.WriteLine("F: " + Forward + " U: " + Up);
         }
+        #endregion
 
         public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float fov, float _aspectRatio = 4.0f / 3.0f)
         {

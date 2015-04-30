@@ -82,6 +82,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Terrain.cs" />
+    <Compile Include="VertexPositionColorNormal.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

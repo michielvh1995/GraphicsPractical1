@@ -117,19 +117,21 @@ namespace GraphicsPractical1
             // ... and using that effect to enable colors
             this.effect.VertexColorEnabled = true;
 
+            // Chapter 7:
+            // 
+            this.effect.LightingEnabled = true;
+            this.effect.DirectionalLight0.Enabled = true;
+            this.effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3();
+            this.effect.DirectionalLight0.Direction = new Vector3(0, -1, 0);
+            this.effect.AmbientLightColor = new Vector3(0.3f);
+
             // Creating our camera
-            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0),_FoV);
+            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0), _FoV);
 
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             loadHeightData();
-            Texture2D map = Content.Load<Texture2D>("heightmap");
+            Texture2D map = Content.Load<Texture2D>("heightmap2");
             this.terrain = new Terrain(new HeightMap(map), 0.2f);
-        }
-
-        // Bonus: camera with differing FoV
-        private void updateCameraFOV()
-        {
-            this.camera.FieldOfView = this._FoV;
         }
 
         /// <summary>
@@ -153,6 +155,20 @@ namespace GraphicsPractical1
 
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
+
+
+            #region Keyboard stuff
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            // Bonus: camera with differing FoV
+            if (Keyboard.GetState().IsKeyDown(Keys.E))
+            {
+                this._FoV += 0.1f * timeStep;
+                this.camera.FieldOfView = this._FoV;
+            }
 
             #region Rotating the object in the world
             /*
@@ -198,21 +214,6 @@ namespace GraphicsPractical1
             }
             #endregion
 
-            #region Keyboard stuff
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                this.Exit();
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.E))
-            {
-                this._FoV += 0.1f * timeStep;
-                this.updateCameraFOV();
-            }
 
             #endregion
 
@@ -231,11 +232,11 @@ namespace GraphicsPractical1
             this.GraphicsDevice.RasterizerState = new RasterizerState
             {
                 CullMode = CullMode.None,
-                FillMode = FillMode.WireFrame
+                FillMode = FillMode.Solid
             };
 
             // Background color of the image
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Matrix translation = Matrix.CreateTranslation(-0.5f * this.terrain.Width, 0, 0.5f * this.terrain.Width);
 
