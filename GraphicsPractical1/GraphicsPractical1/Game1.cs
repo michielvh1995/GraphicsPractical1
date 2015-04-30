@@ -23,10 +23,6 @@ namespace GraphicsPractical1
         // UU provided FPS Counter, with  some additions made by us
         private FrameRateCounter frameRateCounter;
 
-        // Bonus:
-        // Multithreading:
-        private Thread t;
-
         // Adding effects so we can use shaders
         private BasicEffect effect;
 
@@ -39,7 +35,42 @@ namespace GraphicsPractical1
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1()
+
+        #region Bonus:
+        // Multithreading:
+        private Thread t;
+
+        // Laucher options:
+        // Changable FOV:
+        private float fov;
+
+        // Set width at launch
+        private int width;
+
+        // Set height at launch
+        private int height;
+
+        // Set fullscreen or windowed mode
+        private bool fullscreen;
+
+        // Sets Control options
+        // keyboard is for keyboard only
+        // mouse enables a FPS-style camera controls
+        // controller enables an FPS-style camera controller by using an XBOX-controller
+        private bool keyboard;
+        private bool mouse;
+        private bool controller;
+
+        #endregion
+
+        /// <summary>
+        /// The struct-function of the game class. Also used to set some launcher values
+        /// </summary>
+        /// <param name="_fov"> The horizontal field of view we want our program to display in degrees </param>
+        /// <param name="_width"> The width of the window </param>
+        /// <param name="_height"> The height of the window </param>
+        /// <param name="_fullscreen"> Whether we want our program to run in fullscreen (true) or windowed (false) </param>
+        public Game1(float _fov, int _width, int _height, bool _fullscreen, string controlOptions)
         {
             // Initializing the FPS Counter
             this.frameRateCounter = new FrameRateCounter(this);
@@ -49,27 +80,27 @@ namespace GraphicsPractical1
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-        }
 
-        // Temp-o-rary
-        private void loadHeightData()
-        {
-            this.heightData = new float[4, 3];
+            // BONUS:
+            // Launcher options
+            this.fov = _fov;
+            this.width = _width;
+            this.height = _height;
+            this.fullscreen = _fullscreen;
 
-            this.heightData[0, 0] = 0;
-            this.heightData[1, 0] = 0;
-            this.heightData[2, 0] = 0;
-            this.heightData[3, 0] = 0;
-
-            this.heightData[0, 1] = 0.5f;
-            this.heightData[1, 1] = 0;
-            this.heightData[2, 1] = -1.0f;
-            this.heightData[3, 1] = 0.2f;
-
-            this.heightData[0, 2] = 1.0f;
-            this.heightData[1, 2] = 1.2f;
-            this.heightData[2, 2] = 0.8f;
-            this.heightData[3, 2] = 0;
+            switch (controlOptions)
+            {
+                case "keyboard":
+                    this.keyboard = true;
+                    break;
+                case "mouse":
+                    this.mouse = true;
+                    break;
+                case "xbox":
+                    this.controller = true;
+                    break;
+                
+            }
         }
 
         /// <summary>
@@ -81,8 +112,8 @@ namespace GraphicsPractical1
         protected override void Initialize()
         {
             // Screensize
-            this.graphics.PreferredBackBufferWidth = 800;
-            this.graphics.PreferredBackBufferHeight = 600;
+            this.graphics.PreferredBackBufferWidth = this.width;
+            this.graphics.PreferredBackBufferHeight = this.height;
 
             // Fullscreen (Toggle with F11)
             this.graphics.IsFullScreen = false;
@@ -124,17 +155,17 @@ namespace GraphicsPractical1
             this.effect.AmbientLightColor = new Vector3(0.3f);
 
             // Creating our camera
-            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0), _FoV);
+            // BONUS:
+            // The camera class now accepts an FOV option, by default it is 60 degrees.
+            this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0), this.fov);
 
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
-            loadHeightData();
             Texture2D map = Content.Load<Texture2D>("heightmap");
             this.terrain = new Terrain(new HeightMap(map), 0.2f, GraphicsDevice);
         }
 
         /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
+        /// UnloadContent will be called once per game and is the place to unload all content.
         /// </summary>
         protected override void UnloadContent()
         {
@@ -154,18 +185,57 @@ namespace GraphicsPractical1
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
 
-            #region Keyboard stuff
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
-                this.Exit();
 
             // Bonus: camera with differing FoV
+            // NEEDS SOME MORE LOVE!
             if (Keyboard.GetState().IsKeyDown(Keys.E))
             {
                 //this._FoV += 0.1f * timeStep;
-                this.camera.updateFoV(0.1f * timeStep);
+                this.fov += 5f * timeStep;
+                this.camera.updateFoV(this.fov);
             }
+
+            #region Keyboard stuff
+            KeyboardState kbState = Keyboard.GetState();
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                kbState.IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            #region BONUS:
+            // More advanced camera movement.
+            if (kbState.IsKeyDown(Keys.W))
+            {
+                float distance = 25f * timeStep;
+                this.camera.MoveForward(distance);
+            }
+            if (kbState.IsKeyDown(Keys.S))
+            {
+                float distance = -25f * timeStep;
+                this.camera.MoveForward(distance);
+            }
+
+            if (kbState.IsKeyDown(Keys.A))
+            {
+                float distance = 25f * timeStep;
+                this.camera.Rotate(distance);
+            }
+            if (kbState.IsKeyDown(Keys.D))
+            {
+                float distance = -25f * timeStep;
+                this.camera.Rotate(distance);
+            }
+            if (kbState.IsKeyDown(Keys.Space))
+            {
+                float distance = -25f * timeStep;
+                this.camera.Pitch(distance);
+            }
+            if (kbState.IsKeyDown(Keys.LeftShift))
+            {
+                float distance = 25f * timeStep;
+                this.camera.Pitch(distance);
+            }
+            #endregion Camera Control
 
             #region Rotating the object in the world
             /*
@@ -174,8 +244,9 @@ namespace GraphicsPractical1
              Doing the former would make the "Physics" of this game/simulation be bound to the frame rate: doubling the FPS would double the rotation speed.
              Using the latter, the triangle will rotate every x seconds y degrees, no matter what the FPS is.
             */
+
+            // Rotating the world-object horizontally (around the y-axis).
             float deltaAngle = 0;
-            KeyboardState kbState = Keyboard.GetState();
             if (kbState.IsKeyDown(Keys.Left))
             {
                 deltaAngle += -3 * timeStep;
@@ -188,32 +259,13 @@ namespace GraphicsPractical1
                        this.camera.Eye,
                        Matrix.CreateFromAxisAngle(this.camera.Up, deltaAngle)
                        );
-                Console.WriteLine("(E: " + this.camera.Eye + "; F: " + this.camera.Focus + "; U: " + this.camera.Up + ")");
             }
-
-            float yAngle = 0;
-            if (kbState.IsKeyDown(Keys.Up))
-            {
-                yAngle += -30.0f * timeStep;
-            }
-            if (kbState.IsKeyDown(Keys.Down))
-                yAngle += 30.0f * timeStep;
-            if (yAngle != 0)
-            {
-                this.camera.Pitch(yAngle);
-
-                this.camera.Forward.Normalize();
-                var left = Vector3.Cross(this.camera.Up, this.camera.Forward);
-                left.Normalize();
-
-                this.camera.Forward = Vector3.Transform(this.camera.Forward, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(yAngle)));
-                this.camera.Up = Vector3.Transform(this.camera.Up, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(yAngle)));
-            }
-            #endregion
-
-
-            #endregion
-
+            #endregion Rotating the world
+            
+            
+            
+            #endregion Keyboard
+            
             base.Update(gameTime);
         }
 
@@ -241,7 +293,6 @@ namespace GraphicsPractical1
             this.effect.Projection = this.camera.ProjectionMatrix;
             this.effect.View = this.camera.ViewMatrix;
             this.effect.World = translation;
-            this.effect.World = Matrix.Identity;
 
             foreach (EffectPass pass in this.effect.CurrentTechnique.Passes)
             {

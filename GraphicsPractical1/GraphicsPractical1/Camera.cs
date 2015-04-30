@@ -29,7 +29,6 @@ namespace GraphicsPractical1
         private Vector3 forward;
 
         // Bonus: changable FoV
-        private float fieldOfView;
         private float aspectRatio;
 
         public Vector3 Forward
@@ -40,18 +39,20 @@ namespace GraphicsPractical1
                 this.forward = value;
                 Vector3 newEye = focus - Forward;
                 if (eye != newEye)
+                {
                     eye = newEye;
+                    this.updateViewMatrix();
+                }
             }
         }
-
         // These matrices have no set-function, because the projection matrix, once set, probably never has to be changed and the view matrix only depends on the eye and focus vector, so it makes more sense to  adjust  the  view  matrix  by  changing  those  properties.
         // However, the viewMatri has to be recalculated each time the eye- or focus vector changes.
         public Matrix ViewMatrix
         {
-            get { return this.viewMatrix; }
-
-            // Testing: adding 3 dimensinal rotation
-            set { viewMatrix = value; }
+            get
+            {
+                return this.viewMatrix;
+            }
         }
 
         public Matrix ProjectionMatrix
@@ -80,6 +81,45 @@ namespace GraphicsPractical1
             }
         }
 
+
+        #region BONUS
+        // The MoveForward(..) funtion allows the camerato be moved both forwards and backwards.
+        // 
+        public void MoveForward(float amount)
+        {
+            this.forward.Normalize();
+            this.eye += this.forward * amount;
+            this.updateViewMatrix();
+        }
+
+        public void Rotate(float amount)
+        {
+            // Omzetten naar de focus
+            // Forward = target - position
+            // Forward - eye = focus
+            this.up.Normalize();
+            Vector3 x = new Vector3(1,0,0);
+
+            this.forward = Vector3.Transform(this.forward, Matrix.CreateFromAxisAngle(Up, MathHelper.ToRadians(amount)));
+            this.focus = forward - eye;
+            
+            this.updateViewMatrix();
+        }
+
+        public void Pitch(float amount)
+        {
+            this.up.Normalize();
+            var left = Vector3.Cross(this.up, this.forward);
+            left.Normalize();
+            Console.WriteLine(left);
+
+            this.focus = Vector3.Transform(this.focus, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
+
+            this.updateViewMatrix();
+        }
+
+        #endregion
+
         #region Rotation around the X-axis
         // Used for rotating the thing up and down
         public Vector3 Up
@@ -91,34 +131,22 @@ namespace GraphicsPractical1
                 updateViewMatrix();
             }
         }
-
-        public void Pitch(float amount)
-        {
-            Forward.Normalize();
-
-            var left = Vector3.Cross(Up, Forward);
-            left.Normalize();
-
-            Forward = Vector3.Transform(Forward, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
-            Up = Vector3.Transform(Up, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
-        }
         #endregion
 
-        public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float fov, float _aspectRatio = 4.0f / 3.0f)
+        public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float hFOV = 60, float _aspectRatio = 4.0f / 3.0f)
         {
             this.up = camUp;
             this.eye = camEye;
             this.focus = camFocus;
 
-            // Bonus (Changable FoV):
-            this.fieldOfView = fov;
-            this.aspectRatio = _aspectRatio;
-            this.updateFoV(0f);
+            // Bonus:
+            // Changable FoV
+            this.updateFoV(hFOV);
 
             this.updateViewMatrix();
         }
 
-        public void updateFoV(float value)
+        public void updateFoV(float fov)
         {
             // Filling in the projectionMatrix, with the added Bonus nolonger needs to be only filled once, but everytime the FoV changes.
             // This determines how the camera will look at the scene.
@@ -129,21 +157,36 @@ namespace GraphicsPractical1
             // Argument 4: maximum viewing distance, objects that are too far away wont be rendered
 
             // Te groter argument 1 is, te groter de FoV
-            this.aspectRatio += value;
-            this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(this.fieldOfView, this.aspectRatio, 1.0f, 300.0f);
+
+            // The FoV here is in degrees, thus needs to be converted to radians first. 180 degrees = 1 Pi radian
+
+            // The aspectRatio variable influences the horizontal FoV, while the fieldOfView variable influences the vertical FoV.
+            // The base FoVs are: V: 1/4 Pi = 45 deg
+            //                    H: 1.3* V = 60 deg = 1/3 Pi
+            // Increasing horizontal FoV to a specified amount would require us change the FoV to an aspect ratio.
+            // where 60 degrees coressponds with a = 1.333, 90 degrees would correspond with a = 2.
+            float vFOV = MathHelper.PiOver4;
+
+
+            this.aspectRatio = MathHelper.ToRadians(fov / vFOV);
+
+            Console.WriteLine("a: " + this.aspectRatio + " , fov: " + fov + " , vFOV: " + vFOV);
+
+            this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(vFOV, this.aspectRatio, 1.0f, 500.0f);
         }
 
         // This method creates the view matrix, a matrix that stores the position and orientation of the camera, through which we look at the scene.
         private void updateViewMatrix()
         {
+            Console.WriteLine("up: " + this.up + " eye: " + this.eye + "focus: " + this.focus);
+
             /* 
               Argument 1: the position of the camera
               Argument 2: the direction it's looking in
               Argument 3: what direction is considered to be up
             */
-            this.viewMatrix = Matrix.CreateLookAt(this.eye, this.focus, this.up);
-            this.Forward = this.focus - this.eye;
-
+            this.forward = this.focus - this.eye;
+            this.viewMatrix = Matrix.CreateLookAt(this.eye, this.forward, this.up);
         }
     }
 }
