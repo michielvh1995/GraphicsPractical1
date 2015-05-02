@@ -31,6 +31,11 @@ namespace GraphicsPractical1
         // Bonus: changable FoV
         private float aspectRatio;
 
+        public Vector3 Up
+        {
+            get { return this.up; }
+        }
+
         public Vector3 Forward
         {
             get { return this.forward; }
@@ -81,10 +86,7 @@ namespace GraphicsPractical1
             }
         }
 
-
         #region BONUS
-        // The MoveForward(..) funtion allows the camerato be moved both forwards and backwards.
-        // 
         public void MoveForward(float amount)
         {
             this.forward.Normalize();
@@ -98,11 +100,11 @@ namespace GraphicsPractical1
             // Forward = target - position
             // Forward - eye = focus
             this.up.Normalize();
-            Vector3 x = new Vector3(1,0,0);
+            Vector3 x = new Vector3(1, 0, 0);
 
-            this.forward = Vector3.Transform(this.forward, Matrix.CreateFromAxisAngle(Up, MathHelper.ToRadians(amount)));
+            this.forward = Vector3.Transform(this.forward, Matrix.CreateFromAxisAngle(this.up, MathHelper.ToRadians(amount)));
             this.focus = forward - eye;
-            
+
             this.updateViewMatrix();
         }
 
@@ -111,27 +113,32 @@ namespace GraphicsPractical1
             this.up.Normalize();
             var left = Vector3.Cross(this.up, this.forward);
             left.Normalize();
-            Console.WriteLine(left);
 
             this.focus = Vector3.Transform(this.focus, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
 
             this.updateViewMatrix();
         }
 
-        #endregion
-
-        #region Rotation around the X-axis
-        // Used for rotating the thing up and down
-        public Vector3 Up
+        public void Strafe(float amount)
         {
-            get { return this.up; }
-            set
-            {
-                this.up = value;
-                updateViewMatrix();
-            }
+            var left = Vector3.Cross(this.up, this.forward);
+            left.Normalize();
+
+            this.eye += left * amount;
+
+            this.updateViewMatrix();
+        }
+
+        public void Raise(float amount)
+        {
+            this.up.Normalize();
+            this.eye += up * amount;
+
+            this.updateViewMatrix();
         }
         #endregion
+
+
 
         public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float hFOV = 60, float _aspectRatio = 4.0f / 3.0f)
         {
@@ -170,16 +177,12 @@ namespace GraphicsPractical1
 
             this.aspectRatio = MathHelper.ToRadians(fov / vFOV);
 
-            Console.WriteLine("a: " + this.aspectRatio + " , fov: " + fov + " , vFOV: " + vFOV);
-
             this.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(vFOV, this.aspectRatio, 1.0f, 500.0f);
         }
 
         // This method creates the view matrix, a matrix that stores the position and orientation of the camera, through which we look at the scene.
         private void updateViewMatrix()
         {
-            Console.WriteLine("up: " + this.up + " eye: " + this.eye + "focus: " + this.focus);
-
             /* 
               Argument 1: the position of the camera
               Argument 2: the direction it's looking in

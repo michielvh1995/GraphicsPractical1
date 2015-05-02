@@ -5,8 +5,6 @@ c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\Graphic
 c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\GraphicsPractical1.exe
 c:\users\michiel\documents\visual studio 2013\Projects\GraphicsPractical\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\GraphicsPractical1.pdb
 C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\heightmap.xnb
-C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\heightmap2.xnb
-C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\Content\terrain.xnb
 C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\GraphicsPractical1.exe
 C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\bin\x86\Debug\GraphicsPractical1.pdb
 C:\Users\michiel\Documents\GitHub\GraphicsPractical1\GraphicsPractical1\GraphicsPractical1\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt

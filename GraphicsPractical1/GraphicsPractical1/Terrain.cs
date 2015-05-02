@@ -154,6 +154,7 @@ namespace GraphicsPractical1
             device.Indices = this.indexBuffer;
             device.SetVertexBuffer(this.vertexBuffer);
         }
+        
         // Chapter 6: the Terrain's Draw(..) function, used to draw this thing on the screen when called by the main functions
         public void Draw(GraphicsDevice device)
         {

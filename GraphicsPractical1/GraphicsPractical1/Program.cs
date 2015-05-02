@@ -23,7 +23,7 @@ namespace GraphicsPractical1
             int height = 600;
             float fov = 60;
             bool screen = false;
-            string controls = "keyboard";
+            bool controls = false;
 
             for (int i = 0; i < args.Length - 1; i += 2)
             {
@@ -43,7 +43,7 @@ namespace GraphicsPractical1
                             screen = true;
                         break;
                     case "-c":
-                        controls = args[i + 1];
+                        controls = args[i + 1] =="gamepad";
                         break;
                 }
             }

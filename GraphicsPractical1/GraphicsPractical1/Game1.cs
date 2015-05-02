@@ -35,11 +35,7 @@ namespace GraphicsPractical1
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-
         #region Bonus:
-        // Multithreading:
-        private Thread t;
-
         // Laucher options:
         // Changable FOV:
         private float fov;
@@ -54,13 +50,12 @@ namespace GraphicsPractical1
         private bool fullscreen;
 
         // Sets Control options
-        // keyboard is for keyboard only
-        // mouse enables a FPS-style camera controls
-        // controller enables an FPS-style camera controller by using an XBOX-controller
-        private bool keyboard;
-        private bool mouse;
-        private bool controller;
+        // When enableGamepad is set to true, the program will only accept the input given when using a controller. When set to false the program will only accept mouse and keyboard controls
+        private bool enableGamepad;
 
+        // Used for storing the position of the mouse, when using the mouse and keyboard for camera controls
+        // Storing the initial state will allow us to track the movement of the mouse and use it to control the camera
+        MouseState originalMouseState;
         #endregion
 
         /// <summary>
@@ -70,7 +65,7 @@ namespace GraphicsPractical1
         /// <param name="_width"> The width of the window </param>
         /// <param name="_height"> The height of the window </param>
         /// <param name="_fullscreen"> Whether we want our program to run in fullscreen (true) or windowed (false) </param>
-        public Game1(float _fov, int _width, int _height, bool _fullscreen, string controlOptions)
+        public Game1(float _fov, int _width, int _height, bool _fullscreen, bool controlOptions)
         {
             // Initializing the FPS Counter
             this.frameRateCounter = new FrameRateCounter(this);
@@ -88,19 +83,7 @@ namespace GraphicsPractical1
             this.height = _height;
             this.fullscreen = _fullscreen;
 
-            switch (controlOptions)
-            {
-                case "keyboard":
-                    this.keyboard = true;
-                    break;
-                case "mouse":
-                    this.mouse = true;
-                    break;
-                case "xbox":
-                    this.controller = true;
-                    break;
-                
-            }
+            this.enableGamepad = controlOptions;
         }
 
         /// <summary>
@@ -159,6 +142,16 @@ namespace GraphicsPractical1
             // The camera class now accepts an FOV option, by default it is 60 degrees.
             this.camera = new Camera(new Vector3(50, 100, -120), new Vector3(0, 0, 0), new Vector3(0, 1, 0), this.fov);
 
+            // BONUS:
+            // Using the mouse to control the camera
+            if (!enableGamepad)
+            {
+                Mouse.SetPosition(
+                    GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2
+                    );
+                originalMouseState = Mouse.GetState();
+            }
+
             // Chapter 6, turning our loaded image into an array and passing it on to the terrain to make a 3D terrain out of it
             Texture2D map = Content.Load<Texture2D>("heightmap");
             this.terrain = new Terrain(new HeightMap(map), 0.2f, GraphicsDevice);
@@ -185,7 +178,6 @@ namespace GraphicsPractical1
             // Changing the title of the game to contain the FPS.
             this.Window.Title = "Graphics Tutorial | FPS: " + this.frameRateCounter.FrameRate;
 
-
             // Bonus: camera with differing FoV
             // NEEDS SOME MORE LOVE!
             if (Keyboard.GetState().IsKeyDown(Keys.E))
@@ -195,49 +187,23 @@ namespace GraphicsPractical1
                 this.camera.updateFoV(this.fov);
             }
 
-            #region Keyboard stuff
-            KeyboardState kbState = Keyboard.GetState();
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                kbState.IsKeyDown(Keys.Escape))
+            KeyboardState kbState = Keyboard.GetState();
+            GamePadState gpState = GamePad.GetState(PlayerIndex.One);
+
+            if (gpState.Buttons.Back == ButtonState.Pressed || kbState.IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            #region BONUS:
-            // More advanced camera movement.
-            if (kbState.IsKeyDown(Keys.W))
+            if (enableGamepad)
             {
-                float distance = 25f * timeStep;
-                this.camera.MoveForward(distance);
+                this.gamepadHandler(gpState, timeStep);
             }
-            if (kbState.IsKeyDown(Keys.S))
+            else
             {
-                float distance = -25f * timeStep;
-                this.camera.MoveForward(distance);
+                this.keyboardHandler(kbState, timeStep);
             }
 
-            if (kbState.IsKeyDown(Keys.A))
-            {
-                float distance = 25f * timeStep;
-                this.camera.Rotate(distance);
-            }
-            if (kbState.IsKeyDown(Keys.D))
-            {
-                float distance = -25f * timeStep;
-                this.camera.Rotate(distance);
-            }
-            if (kbState.IsKeyDown(Keys.Space))
-            {
-                float distance = -25f * timeStep;
-                this.camera.Pitch(distance);
-            }
-            if (kbState.IsKeyDown(Keys.LeftShift))
-            {
-                float distance = 25f * timeStep;
-                this.camera.Pitch(distance);
-            }
-            #endregion Camera Control
-
-            #region Rotating the object in the world
+            #region Rotating the world
             /*
              Spin the triangle!
              Not using a fixed amount per Update() (angle += 3.0f), but an fixed amount per time (angle += 3*timeStep)!
@@ -261,13 +227,95 @@ namespace GraphicsPractical1
                        );
             }
             #endregion Rotating the world
-            
-            
-            
-            #endregion Keyboard
-            
+
             base.Update(gameTime);
         }
+
+        #region Bonus: Differing control options
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kbState">The current state of the keyboard (what keys are pressed and what not)</param>
+        /// <param name="timeStep">Requires the time between the current and the last calcuation</param>
+        private void keyboardHandler(KeyboardState kbState, float timeStep)
+        {
+            // Mouse handler:
+            MouseState currentMouseState = Mouse.GetState();
+            if (currentMouseState != originalMouseState)
+            {
+                float xDifference = currentMouseState.X - originalMouseState.X;
+                float yDifference = currentMouseState.Y - originalMouseState.Y;
+
+                this.camera.Rotate(-25f * timeStep * xDifference);
+                this.camera.Pitch(25f * timeStep * yDifference);
+
+                Mouse.SetPosition(
+                    GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2
+                    );
+            }
+
+            // Keyboard handler
+            if (kbState.IsKeyDown(Keys.W))
+            {
+                float distance = 25f * timeStep;
+                this.camera.MoveForward(distance);
+            }
+            if (kbState.IsKeyDown(Keys.S))
+            {
+                float distance = -25f * timeStep;
+                this.camera.MoveForward(distance);
+            }
+            if (kbState.IsKeyDown(Keys.A))
+            {
+                float distance = 25f * timeStep;
+                this.camera.Strafe(distance);
+            }
+            if (kbState.IsKeyDown(Keys.D))
+            {
+                float distance = -25f * timeStep;
+                this.camera.Strafe(distance);
+            }
+
+            if (kbState.IsKeyDown(Keys.Space))
+            {
+                float distance = 25f * timeStep;
+                this.camera.Raise(distance);
+            }
+            if (kbState.IsKeyDown(Keys.LeftShift))
+            {
+                float distance = -25f * timeStep;
+                this.camera.Raise(distance);
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gpState">Requires the current state of the gamepad</param>
+        /// <param name="timeStep"></param>
+        private void gamepadHandler(GamePadState gpState, float timeStep)
+        {
+            if (gpState.ThumbSticks.Left != Vector2.Zero)
+            {
+                this.camera.Strafe(
+                    -20f * timeStep * gpState.ThumbSticks.Left.X
+                    );
+                this.camera.MoveForward(
+                    40f * timeStep * gpState.ThumbSticks.Left.Y
+                );
+            }
+            if (gpState.ThumbSticks.Right != Vector2.Zero)
+            {
+                this.camera.Pitch(
+                    -40f * timeStep * gpState.ThumbSticks.Right.Y
+                    );
+                this.camera.Rotate(
+                    -40f * timeStep * gpState.ThumbSticks.Right.X
+                );
+            }
+        }
+        #endregion
 
         /// <summary>
         /// This is called when the game should draw itself.
