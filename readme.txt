@@ -1,10 +1,10 @@
 By:
 Michiel van Heusden, 4173309
-Bob Best,
-Ruben Meeuwesse
+Bob Best,            .
+Ruben Meeuwesse,     .
 
 Base Information:
- * The program is made using HiDef.
+ * The program is made with the HiDef profile
  * No additional packages were installed
  * Programmed on a Windows 8.1 version of Visual Studio 2013
    - This required a non-official installer for XNA Game Studio.
@@ -45,12 +45,19 @@ Extra Features:
   * WARNING: The FoV may seem to barely change, but eventually it will be messed up (FoV > 200)
 
 4) Terrain Colors based on height:
-  * Potato
+  * Currently they are crudely implemented
+  * The colors are (from low to high):
+    - Blue
+    - Green
+    - Gray
+    - White
 
 5) A launcher:
   * The launcher .bat file can be found in the same folder as the solution
-  * None of the options are required
-  * Has few options:
+  * The launcher only works when the program has been build, which can be done by:
+    - Selecting the debug option in visual studio
+    - Build -> Build Solution
+  * It has few options:
     -c sets the input method:
       -> gamepad sets the input method to gamepad only
       -> anything else will default to keyboard & mouse
@@ -59,4 +66,5 @@ Extra Features:
     -fov sets the FoV of the camera
     -s sets the screen:
       -> fullscreen sets the screen to fullscreen
-      -> windowed keeps it windowed
+      -> anything else will default to windowed
+  * None of the options are required; when they are not set, they will be set to a default value

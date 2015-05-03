@@ -10,7 +10,6 @@ namespace GraphicsPractical1
         /// 
         /// The variables are used to set some settings of the program.
         /// When started from the launcher the variables on top can have a user specified value
-        /// 
         /// </summary>
         /// <param name="args"> These are the launcher options. </param>
         static void Main(string[] args)
