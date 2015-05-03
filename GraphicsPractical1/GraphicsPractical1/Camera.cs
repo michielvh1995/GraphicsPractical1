@@ -82,6 +82,7 @@ namespace GraphicsPractical1
             set
             {
                 this.focus = value;
+
                 this.updateViewMatrix();
             }
         }
@@ -114,7 +115,7 @@ namespace GraphicsPractical1
             var left = Vector3.Cross(this.up, this.forward);
             left.Normalize();
 
-            this.focus = Vector3.Transform(this.focus, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
+            Focus = Vector3.Transform(this.focus, Matrix.CreateFromAxisAngle(left, MathHelper.ToRadians(amount)));
 
             this.updateViewMatrix();
         }
@@ -153,6 +154,10 @@ namespace GraphicsPractical1
             this.updateViewMatrix();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fov"></param>
         public void updateFoV(float fov)
         {
             // Filling in the projectionMatrix, with the added Bonus nolonger needs to be only filled once, but everytime the FoV changes.
@@ -190,6 +195,12 @@ namespace GraphicsPractical1
             */
             this.forward = this.focus - this.eye;
             this.viewMatrix = Matrix.CreateLookAt(this.eye, this.forward, this.up);
+
+
+            Console.WriteLine(this.focus);
+
         }
+
+
     }
 }
