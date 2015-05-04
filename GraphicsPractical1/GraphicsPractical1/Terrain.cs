@@ -7,17 +7,18 @@ using System.Text;
 
 namespace GraphicsPractical1
 {
+    /// <summary>
+    /// Chapter 6:
+    /// The Terrain class, used for storing all data on the terrain.
+    /// 
+    /// Creating a separate class for the terrain allows our "engine" to be more dynamic, as it is better adapted to different sizes
+    /// The width and height values of the Terrain are the number of vertices horizontally and vertically
+    /// The color and the position of the vertices of the terrain will be stored in the "vertices" array. 
+    /// 
+    /// The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a Vector in a 3D plane), a color (RGB) and the Normal of the vector
+    /// </summary>
     class Terrain
     {
-        /*
-          Chapter 6: The Terrain class, used for storing all data on the terrain.
-          A separate class is used to make our "engine" suited for all sizes (more dynamic)
-
-          The width and height values of the Terrain are the number of vertices horizontally and vertically respectively.
-         
-          The color and the position of the vertices of the terrain will be stored in the "vertices" variable. 
-          The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a Vector in a 3D plane) and a color (RGBA).
-        */
         private int width;
         private int height;
 
@@ -76,6 +77,7 @@ namespace GraphicsPractical1
         /// 
         /// Chapter 7: 
         /// Changed all occurences of VertexPositionColor to VertexPositionColorNormal
+        /// 
         /// </summary>
         /// <param name="heightMap"></param>
         /// <param name="heightScale"></param>
@@ -145,10 +147,11 @@ namespace GraphicsPractical1
         /// <summary>
         /// Chapter 7:
         /// Calculates the normals of each of the vertices
+        /// 
         /// Chapter 8:
         /// Improved calculation method: now uses indices for the triangles.
         /// 
-        /// What are normals?
+        /// What are normals? Why are they important?
         /// 
         /// </summary>
         private void calculateNormals()

@@ -7,6 +7,11 @@ using System.Text;
 
 namespace GraphicsPractical1
 {
+    /// <summary>
+    /// The VertexPositionColorNormal struct are actually a bunch of vertices combined in one struct
+    /// These vertices are: the position of a point, the color of a point and the normal of this point
+    /// This struct does not calculate anything and is only used to store data
+    /// </summary>
     struct VertexPositionColorNormal : IVertexType
     {
         public Vector3 Position;

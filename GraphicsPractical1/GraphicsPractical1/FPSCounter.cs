@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GraphicsPractical1
 {
+    /// <summary>
+    /// The FrameRateCounter (FPS Counter), as provided by the University
+    /// It works by comparing the time between the current and previous frame
+    /// </summary>
     class FrameRateCounter : DrawableGameComponent
     {
         int frameRate, frameCounter, secondsPassed;

@@ -8,18 +8,18 @@ namespace GraphicsPractical1
 {
     class Camera
     {
-        /*
-         The Variables:
-          Matrices:
-         * viewMatrix       : 
-         * projectionMatrix : 
-          
-          Vertices:
-         * up           : What direction the camera sees as pointing upwards
-         * eye          : The position of the camera in the 3D world
-         * focus        : The exact point the camera is looking twards in the 3D world
-         * aspectRatio  : the ratio width : height of the screen, for Chapter 1 we've set the screen to 800 by 600, making it ~1.3333
-        */
+        // The Variables:
+        //  Matrices:
+        //  * viewMatrix       : What part of the world the camera can see
+        //  * projectionMatrix : How the "world" is projected on the screen and what transformations are applied
+        //
+        //  Vertices:
+        //  * up           : What direction the camera sees as pointing upwards
+        //  * eye          : The position of the camera in the 3D world
+        //  * focus        : The exact point the camera is looking twards in the 3D world
+        //  * aspectRatio  : the ratio width : height of the screen, for Chapter 1 we've set the screen to 800 by 600, making it ~1.3333
+        // The Bonus Assignment Variables:
+        // * forward (vector): The direction the camera is pointing in, used in some functions
         private Matrix viewMatrix;
         private Matrix projectionMatrix;
 
@@ -33,30 +33,13 @@ namespace GraphicsPractical1
             get { return this.up; }
         }
 
-        public Vector3 Forward
-        {
-            get { return this.forward; }
-            set
-            {
-                this.forward = value;
-                Vector3 newEye = focus - Forward;
-                if (eye != newEye)
-                {
-                    eye = newEye;
-                    this.updateViewMatrix();
-                }
-            }
-        }
-        // These matrices have no set-function, because the projection matrix, once set, probably never has to be changed and the view matrix only depends on the eye and focus vector, so it makes more sense to  adjust  the  view  matrix  by  changing  those  properties.
-        // However, the viewMatri has to be recalculated each time the eye- or focus vector changes.
+        // These matrices (the ViewMatrix and ProjectionMatrix) have no set-function.
+        // This is because the ViewMatrix is only updated by functions inside the camera class, and only whenever either the Eye or Focus vector changes values.
+        // The ProjectionMatrix is only updated whenever the FoV changes. This again is calculated inside the camera class.
         public Matrix ViewMatrix
         {
-            get
-            {
-                return this.viewMatrix;
-            }
+            get { return this.viewMatrix; }
         }
-
         public Matrix ProjectionMatrix
         {
             get { return this.projectionMatrix; }
@@ -79,14 +62,15 @@ namespace GraphicsPractical1
             set
             {
                 this.focus = value;
-
                 this.updateViewMatrix();
             }
         }
 
         #region BONUS
         /// <summary>
-        /// 
+        /// Moves the camera forwards in the 3D world
+        /// The forward vector is normalized as this will make sure that, when multiplied, the camera will move the amount we have put in
+        /// Everytime the camera moves, the viewMatrix will have to be updated as it now looks at the world from a different angle
         /// </summary>
         /// <param name="amount"> The amount the camera will move in the 3D world </param>
         public void MoveForward(float amount)
@@ -97,39 +81,41 @@ namespace GraphicsPractical1
         }
 
         /// <summary>
-        /// 
+        /// Moves the camera sideways in the 3D world
+        /// For this the left vector is calculated, to know which direction is sideways
+        /// Everytime the camera moves, the viewMatrix will have to be updated as it now looks at the world from a different angle
         /// </summary>
         /// <param name="amount"> The amount the camera will move in the 3D world </param>
         public void Strafe(float amount)
         {
             var left = Vector3.Cross(this.up, this.forward);
             left.Normalize();
-
             this.eye += left * amount;
 
             this.updateViewMatrix();
         }
 
         /// <summary>
-        /// 
+        /// Moves the camera up in the 3D world by a specified amount
+        /// Everytime the camera moves, the viewMatrix will have to be updated as it now looks at the world from a different angle
         /// </summary>
         /// <param name="amount"> The amount the camera will move in the 3D world </param>
         public void Raise(float amount)
         {
             this.up.Normalize();
             this.eye += up * amount;
-
             this.updateViewMatrix();
         }
 
         /// <summary>
-        /// 
+        /// Rotates the camera to the left or right by a specified amount in degrees
+        /// The rotation is done around the up axis of the camera
+        /// Everytime the camera moves, the viewMatrix will have to be updated as it now looks at the world from a different angle
         /// </summary>
-        /// <param name="amount"></param>
+        /// <param name="amount"> The amount of degrees the camera will rotate </param>
         public void Rotate(float amount)
         {
             this.up.Normalize();
-            Vector3 x = new Vector3(1, 0, 0);
 
             this.forward = Vector3.Transform(this.forward, Matrix.CreateFromAxisAngle(this.up, MathHelper.ToRadians(amount)));
             this.focus = forward - eye;
@@ -138,9 +124,11 @@ namespace GraphicsPractical1
         }
 
         /// <summary>
-        /// Turns the camera up or downwards
+        /// Rotates the camera up or downwards by a specified amount in degrees
+        /// Rotation is done around the left vector - the cross-product of the up and forward vectors
+        /// Everytime the camera moves, the viewMatrix will have to be updated as it now looks at the world from a different angle
         /// </summary>
-        /// <param name="amount"></param>
+        /// <param name="amount"> The amount of degrees the camera will rotate </param>
         public void Pitch(float amount)
         {
             this.up.Normalize();
@@ -154,6 +142,7 @@ namespace GraphicsPractical1
 
         #endregion
 
+        // the constructor method
         public Camera(Vector3 camEye, Vector3 camFocus, Vector3 camUp, float hFOV = 60, float _aspectRatio = 4.0f / 3.0f)
         {
             this.up = camUp;
@@ -198,7 +187,7 @@ namespace GraphicsPractical1
             // Argument 2: the direction it's looking in
             // Argument 3: what direction is considered to be up
             this.forward = this.focus - this.eye;
-            this.viewMatrix = Matrix.CreateLookAt(this.eye, this.forward, this.up);
+            this.viewMatrix = Matrix.CreateLookAt(this.eye, this.focus, this.up);
         }
     }
 }
