@@ -102,8 +102,8 @@ namespace GraphicsPractical1
             this.graphics.PreferredBackBufferWidth = this.width;
             this.graphics.PreferredBackBufferHeight = this.height;
 
-            // Fullscreen (Toggle with F11)
-            this.graphics.IsFullScreen = false;
+            // Fullscreen
+            this.graphics.IsFullScreen = this.fullscreen;
 
             // VSync
             this.graphics.SynchronizeWithVerticalRetrace = false;
