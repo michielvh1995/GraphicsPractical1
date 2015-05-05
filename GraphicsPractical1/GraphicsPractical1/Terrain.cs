@@ -15,7 +15,7 @@ namespace GraphicsPractical1
     /// The width and height values of the Terrain are the number of vertices horizontally and vertically
     /// The color and the position of the vertices of the terrain will be stored in the "vertices" array. 
     /// 
-    /// The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a Vector in a 3D plane), a color (RGB) and the Normal of the vector
+    /// The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a vector in a 3D plane), a color (RGB) and the Normal of the vector (again a vector)
     /// </summary>
     class Terrain
     {
@@ -23,11 +23,12 @@ namespace GraphicsPractical1
         private int height;
 
         // Chapter 7
-        //
+        // The terrain consists of a lot of triangles, each of which consist of vertices.
+        // These vertices, along with their color and normal, are stored inside this array.
         private VertexPositionColorNormal[] vertices;
 
         // Chapter 8
-        //
+        // We are using an array of shorts for the indices to try to preserve some space on the GPU
         private short[] indices;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
@@ -64,20 +65,18 @@ namespace GraphicsPractical1
             this.setupIndices();
 
             // Chapter 7:
-            //
+            // Calls the function which handles the calculation of the normals for us
             this.calculateNormals();
 
             // Chapter 8:
-            //
+            // Calls the function which stores all the vertices to the memory of the GPU
             this.copyToBuffers(device);
         }
 
         /// <summary>
-        /// Chapter 6: 
-        /// 
-        /// Chapter 7: 
-        /// Changed all occurences of VertexPositionColor to VertexPositionColorNormal
-        /// 
+        /// This function turns the heightmap (and scale) into VertexPositionColorNormals.
+        /// It begins by initializing the array to be big enough
+        /// In this loop it stores the vertices and assigns a color to each
         /// </summary>
         /// <param name="heightMap"></param>
         /// <param name="heightScale"></param>
@@ -112,6 +111,7 @@ namespace GraphicsPractical1
                         vertices[v].Color = Color.White;
                     }
                 }
+            
             return vertices;
         }
 
@@ -119,7 +119,7 @@ namespace GraphicsPractical1
         /// Chapter 8:
         /// Changed SetupVertices(..) to SetupIndices()
         /// The first line of this function initializes the incides array to be big enough to store the indices
-        /// 
+        /// The rest of this function tells which index is where
         /// </summary>
         private void setupIndices()
         {
@@ -145,14 +145,14 @@ namespace GraphicsPractical1
         }
 
         /// <summary>
-        /// Chapter 7:
-        /// Calculates the normals of each of the vertices
+        /// In the first loop of this function it calculates the normals of each triangle, based on the indices
+        /// In the second loop it normalizes the normals (sets them to length = 1)
         /// 
-        /// Chapter 8:
-        /// Improved calculation method: now uses indices for the triangles.
-        /// 
-        /// What are normals? Why are they important?
-        /// 
+        /// What are normals? 
+        ///  The normal of a vector is the vector that is perpendicular to the original vector
+        ///  The normals calculated here are the surface normals of the triangles.
+        /// Why are normals important?
+        ///  The surface normals are used for calculating how the reflections of the light should be
         /// </summary>
         private void calculateNormals()
         {
