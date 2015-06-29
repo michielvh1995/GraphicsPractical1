@@ -1,3 +1,1 @@
 Content\heightmap.xnb
-Content\heightmap2.xnb
-Content\terrain.xnb

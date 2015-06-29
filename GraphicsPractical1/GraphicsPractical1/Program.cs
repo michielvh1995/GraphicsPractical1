@@ -8,13 +8,12 @@ namespace GraphicsPractical1
         /// <summary>
         /// The main entry point for the application.
         /// 
-        /// BONUS:
-        /// 
-        /// 
+        /// The variables are used to set some settings of the program.
+        /// When started from the launcher the variables on top can have a user specified value
         /// </summary>
+        /// <param name="args"> These are the launcher options. </param>
         static void Main(string[] args)
         {
-            
             #region BONUS
             // Handling the input args
             // Setting the default values for each of the inputs
@@ -23,8 +22,9 @@ namespace GraphicsPractical1
             int height = 600;
             float fov = 60;
             bool screen = false;
-            string controls = "keyboard";
+            bool controls = false;
 
+            // Reading the input arguments and selecting for each of them what the value would be
             for (int i = 0; i < args.Length - 1; i += 2)
             {
                 switch (args[i])
@@ -43,7 +43,7 @@ namespace GraphicsPractical1
                             screen = true;
                         break;
                     case "-c":
-                        controls = args[i + 1];
+                        controls = args[i + 1] =="gamepad";
                         break;
                 }
             }

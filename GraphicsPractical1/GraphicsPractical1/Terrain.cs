@@ -7,26 +7,28 @@ using System.Text;
 
 namespace GraphicsPractical1
 {
+    /// <summary>
+    /// Chapter 6:
+    /// The Terrain class, used for storing all data on the terrain.
+    /// 
+    /// Creating a separate class for the terrain allows our "engine" to be more dynamic, as it is better adapted to different sizes
+    /// The width and height values of the Terrain are the number of vertices horizontally and vertically
+    /// The color and the position of the vertices of the terrain will be stored in the "vertices" array. 
+    /// 
+    /// The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a vector in a 3D plane), a color (RGB) and the Normal of the vector (again a vector)
+    /// </summary>
     class Terrain
     {
-        /*
-          Chapter 6: The Terrain class, used for storing all data on the terrain.
-          A seperate class is used to make our "engine" suited for all sizes (more dynamic)
-          
-         * 
-         * 
-          The width and height values of the Terrain are the number of vertices horizontally and vertically respectively.
-         
-          The color and the position of the vertices of the terrain will be stored in the "vertices" variable. 
-          The VertexPositionColorNormal variable type can be seen as a tuple consisting of a position (a Vector in a 3D plane) and a color (RGBA).
-        */
         private int width;
         private int height;
 
         // Chapter 7
+        // The terrain consists of a lot of triangles, each of which consist of vertices.
+        // These vertices, along with their color and normal, are stored inside this array.
         private VertexPositionColorNormal[] vertices;
 
         // Chapter 8
+        // We are using an array of shorts for the indices to try to preserve some space on the GPU
         private short[] indices;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
@@ -40,7 +42,16 @@ namespace GraphicsPractical1
             get { return this.height; }
         }
 
-        // The constructor method
+        /// <summary>
+        /// The constructor method
+        /// </summary>
+        /// <param name="heightMap">
+        /// The heightmap as calculated in the main function, this will be used to determine the height of the surface of the object
+        /// </param>
+        /// <param name="heightScale">
+        /// A higher heightScale will result in higher and sharper peaks. With a low heightscale everything will be rather flat
+        /// </param>
+        /// <param name="device"></param>
         public Terrain(HeightMap heightMap, float heightScale, GraphicsDevice device)
         {
             this.width = heightMap.Width;
@@ -54,15 +65,22 @@ namespace GraphicsPractical1
             this.setupIndices();
 
             // Chapter 7:
+            // Calls the function which handles the calculation of the normals for us
             this.calculateNormals();
 
             // Chapter 8:
+            // Calls the function which stores all the vertices to the memory of the GPU
             this.copyToBuffers(device);
         }
-        // Chapter 6:
-        //
-        // Chapter 7:
-        // Changed all occurences of VertexPositionColor to VertexPositionColorNormalNormal
+
+        /// <summary>
+        /// This function turns the heightmap (and scale) into VertexPositionColorNormals.
+        /// It begins by initializing the array to be big enough
+        /// In this loop it stores the vertices and assigns a color to each
+        /// </summary>
+        /// <param name="heightMap"></param>
+        /// <param name="heightScale"></param>
+        /// <returns></returns>
         private VertexPositionColorNormal[] loadVertices(HeightMap heightMap, float heightScale)
         {
             VertexPositionColorNormal[] vertices = new VertexPositionColorNormal[this.width * this.height];
@@ -73,22 +91,36 @@ namespace GraphicsPractical1
                     int v = x + y * this.width;
                     float h = heightMap[x, y] * heightScale;
                     vertices[v].Position = new Vector3(x, h, -y);
-                    vertices[v].Color = Color.Green;
+
+                    // Easy coloring:
+                    // Bit ugly way to determine the correct color... but it works...
+                    if (heightMap[x, y] < 50)
+                    {
+                        vertices[v].Color = Color.DarkBlue;
+                    }
+                    else if (heightMap[x, y] < 100)
+                    {
+                        vertices[v].Color = Color.Green;
+                    }
+                    else if (heightMap[x, y] < 150)
+                    {
+                        vertices[v].Color = Color.DarkSlateGray;
+                    }
+                    else
+                    {
+                        vertices[v].Color = Color.White;
+                    }
                 }
+            
             return vertices;
         }
 
-        /*
-          The first line of the setupVerices(..) function intializes the vertices array to be just big enough for the amount of vertices there will have to be stored.
-          If so, then why *3? Every triangle has 3 corners, each of which have a position and a color.
-         * 
-         * Step 2 of Chapter 6: Replaced the *3 wih *6, since we will be drawing twice as many triangles now, by implementing 3D
-         * 
-        */
-        /*
-            Chapter 8:
-              Changed SetupVertices(..) to SetupIndices()
-        */
+        /// <summary>
+        /// Chapter 8:
+        /// Changed SetupVertices(..) to SetupIndices()
+        /// The first line of this function initializes the incides array to be big enough to store the indices
+        /// The rest of this function tells which index is where
+        /// </summary>
         private void setupIndices()
         {
             this.indices = new short[(this.width - 1) * (this.height - 1) * 6];
@@ -112,10 +144,16 @@ namespace GraphicsPractical1
                 }
         }
 
-        // Chapter 7:
-        // Calculates the normals of each of the vertices
-        // Chapter 8:
-        // Improved calculation method
+        /// <summary>
+        /// In the first loop of this function it calculates the normals of each triangle, based on the indices
+        /// In the second loop it normalizes the normals (sets them to length = 1)
+        /// 
+        /// What are normals? 
+        ///  The normal of a vector is the vector that is perpendicular to the original vector
+        ///  The normals calculated here are the surface normals of the triangles.
+        /// Why are normals important?
+        ///  The surface normals are used for calculating how the reflections of the light should be
+        /// </summary>
         private void calculateNormals()
         {
             for (int i = 0; i < this.indices.Length / 3; i++)
@@ -139,8 +177,13 @@ namespace GraphicsPractical1
                 this.vertices[i].Normal.Normalize();
         }
 
-        // Chapter 8:
-        //
+        /// <summary>
+        /// This function stores the vertices information and the indices information to a buffer.
+        /// This buffer is located in the memory of the GPU.
+        /// 
+        /// Doing this will greatly increase the calculation speed and therefor the FPS
+        /// </summary>
+        /// <param name="device"></param>
         private void copyToBuffers(GraphicsDevice device)
         {
             this.vertexBuffer = new VertexBuffer(
@@ -154,7 +197,12 @@ namespace GraphicsPractical1
             device.Indices = this.indexBuffer;
             device.SetVertexBuffer(this.vertexBuffer);
         }
-        // Chapter 6: the Terrain's Draw(..) function, used to draw this thing on the screen when called by the main functions
+
+        /// <summary>
+        /// Chapter 6:
+        /// The Terrain's Draw(..) function, used to draw the model thing on the screen when called from the main draw function
+        /// </summary>
+        /// <param name="device"></param>
         public void Draw(GraphicsDevice device)
         {
             device.DrawIndexedPrimitives(
